@@ -1,7 +1,7 @@
 # 🎨 Ultimate Image Processing and Enhancement App
 
 A powerful **Streamlit-based image processing app** that allows users to upload images and apply multiple computer vision techniques — from enhancement and filtering to geometric transformations, segmentation, and noise operations — all in real time.
-![Alt text](path/to/image.png)
+![Alt text](image.png)
 
 ## 🚀 Features
 
