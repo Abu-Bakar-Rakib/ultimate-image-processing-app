@@ -28,20 +28,21 @@ if uploaded_file is not None:
     transform = st.sidebar.checkbox("Geometric Transformations", False)
     color_ops = st.sidebar.checkbox("Color Transformations", False)
     noise_ops = st.sidebar.checkbox("Noise Addition / Denoising", False)
+    bg_remove = st.sidebar.checkbox("Background Removal", False) 
 
     processed = img_rgb.copy()
 
-    # --- Enhancement ---
+    #Enhancement
     if enhance:
         img_yuv = cv2.cvtColor(processed, cv2.COLOR_RGB2YUV)
         img_yuv[:, :, 0] = cv2.equalizeHist(img_yuv[:, :, 0])
         processed = cv2.cvtColor(img_yuv, cv2.COLOR_YUV2RGB)
 
-    # --- Grayscale ---
+    # Grayscale
     if grayscale:
         processed = cv2.cvtColor(processed, cv2.COLOR_RGB2GRAY)
 
-    # --- Blurring ---
+    # Blurring 
     if blur:
         blur_type = st.sidebar.selectbox("Select Blur Type", ["Gaussian", "Median", "Bilateral"])
         if blur_type == "Gaussian":
@@ -51,7 +52,7 @@ if uploaded_file is not None:
         else:
             processed = cv2.bilateralFilter(processed, 9, 75, 75)
 
-    # --- Edge Detection ---
+    #Edge Detection
     if edge:
         if len(processed.shape) == 3:
             gray = cv2.cvtColor(processed, cv2.COLOR_RGB2GRAY)
@@ -59,14 +60,14 @@ if uploaded_file is not None:
             gray = processed
         processed = cv2.Canny(gray, 100, 200)
 
-    # --- Sharpening ---
+    #Sharpening
     if sharpen:
         kernel = np.array([[0, -1, 0],
                            [-1, 5, -1],
                            [0, -1, 0]])
         processed = cv2.filter2D(processed, -1, kernel)
 
-    # --- Segmentation ---
+    # Segmentation
     if segment:
         if len(processed.shape) == 3:
             gray = cv2.cvtColor(processed, cv2.COLOR_RGB2GRAY)
@@ -74,7 +75,7 @@ if uploaded_file is not None:
             gray = processed
         _, processed = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
-    # --- Morphological Operations ---
+    #Morphological Operations 
     if morph:
         kernel = np.ones((5, 5), np.uint8)
         morph_type = st.sidebar.selectbox("Morphological Operation", ["Erosion", "Dilation", "Opening", "Closing"])
@@ -89,7 +90,7 @@ if uploaded_file is not None:
         elif morph_type == "Closing":
             processed = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
 
-    # --- Geometric Transformations ---
+    # Geometric Transformations
     if transform:
         trans_type = st.sidebar.selectbox("Transformation", ["Rotate 90°", "Flip Horizontally", "Flip Vertically", "Resize 50%"])
         if trans_type == "Rotate 90°":
@@ -101,7 +102,7 @@ if uploaded_file is not None:
         elif trans_type == "Resize 50%":
             processed = cv2.resize(processed, None, fx=0.5, fy=0.5)
 
-    # --- Color Transformations ---
+    # Color Transformations 
     if color_ops:
         color_type = st.sidebar.selectbox("Color Operation", ["Negative", "Gamma Correction"])
         if color_type == "Negative":
@@ -110,7 +111,7 @@ if uploaded_file is not None:
             gamma = st.sidebar.slider("Gamma Value", 0.1, 3.0, 1.2)
             processed = np.array(255 * ((processed / 255) ** (1 / gamma)), dtype=np.uint8)
 
-    # --- Noise Operations ---
+    #Noise Operations
     if noise_ops:
         noise_type = st.sidebar.selectbox("Noise Option", ["Add Salt & Pepper Noise", "Denoise"])
         if noise_type == "Add Salt & Pepper Noise":
@@ -128,14 +129,31 @@ if uploaded_file is not None:
         elif noise_type == "Denoise":
             processed = cv2.fastNlMeansDenoisingColored(processed, None, 10, 10, 7, 21)
 
-    # --- Display Results ---
+    #Background Removal 
+    if bg_remove:
+        st.sidebar.subheader("🎯 Background Removal Options")
+        mask = np.zeros(processed.shape[:2], np.uint8)
+        bgdModel = np.zeros((1, 65), np.float64)
+        fgdModel = np.zeros((1, 65), np.float64)
+        h, w = processed.shape[:2]
+        rect = (10, 10, w - 20, h - 20)  # Define region for GrabCut
+        cv2.grabCut(processed, mask, rect, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_RECT)
+        mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
+        processed = processed * mask2[:, :, np.newaxis]
+        background_color = st.sidebar.color_picker("Choose Background Color", "#FFFFFF")
+        bg_rgb = tuple(int(background_color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
+        background = np.full_like(img_rgb, bg_rgb, dtype=np.uint8)
+        mask3 = np.repeat(mask2[:, :, np.newaxis], 3, axis=2)
+        processed = processed + background * (1 - mask3)
+
+    #Display Results
     col1, col2 = st.columns(2)
     with col1:
         st.image(img_rgb, caption="🖼️ Original Image", use_container_width=True)
     with col2:
         st.image(processed, caption="✨ Processed Image", use_container_width=True)
 
-    # --- Histogram ---
+    #Histogram
     if len(img_rgb.shape) == 3 and enhance:
         st.subheader("📊 Histogram Comparison")
         fig, ax = plt.subplots(1, 2, figsize=(10, 4))
@@ -148,7 +166,7 @@ if uploaded_file is not None:
         ax[1].set_title("Processed Histogram")
         st.pyplot(fig)
 
-    # --- Download processed image ---
+    #Download processed image
     processed_pil = Image.fromarray(processed if processed.ndim == 2 else cv2.cvtColor(processed, cv2.COLOR_RGB2BGR))
     buf = io.BytesIO()
     processed_pil.save(buf, format="JPEG")
@@ -160,6 +178,3 @@ if uploaded_file is not None:
         file_name="processed_image.jpg",
         mime="image/jpeg"
     )
-
-
-
