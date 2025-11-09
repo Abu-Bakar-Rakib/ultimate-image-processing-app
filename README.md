@@ -17,6 +17,7 @@ A powerful **Streamlit-based image processing app** that allows users to upload 
 ✅ **Noise Operations** — Add salt & pepper noise or denoise images.  
 ✅ **Histogram Comparison** — Visualize before and after histogram changes.  
 ✅ **Download Processed Image** — Save the processed output directly.
+
 ![Alt text](image(2).png)
 ![Alt text](image(1).png)
 
