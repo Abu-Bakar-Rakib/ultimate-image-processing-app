@@ -40,3 +40,6 @@ pip install -r requirements.txt
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
+##✨Author
+#Abu Bakar Rakib
+#📧 rakibcdp@gmail.com
