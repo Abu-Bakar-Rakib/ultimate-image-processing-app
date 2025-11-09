@@ -31,7 +31,7 @@ A powerful **Streamlit-based image processing app** that allows users to upload 
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/<your-username>/ultimate-image-processing-app.git
+git clone https://github.com/<Abu-Bakar-Rakib>/ultimate-image-processing-app.git
 cd ultimate-image-processing-app
 pip install -r requirements.txt
 
