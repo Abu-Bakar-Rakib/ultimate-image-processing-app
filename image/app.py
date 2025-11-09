@@ -8,9 +8,7 @@ import io
 st.set_page_config(page_title="Ultimate Image Processing App", layout="wide")
 
 st.title("🎨 Ultimate Image Processing and Enhancement App")
-st.write(
-    "Upload an image and apply multiple image processing techniques!"
-)
+st.write("Upload an image and apply multiple image processing techniques!")
 
 uploaded_file = st.file_uploader("📁 Upload an Image", type=["jpg", "jpeg", "png"])
 
@@ -20,16 +18,16 @@ if uploaded_file is not None:
 
     # Sidebar options
     st.sidebar.header("🧩 Select Image Processing Features")
-    enhance = st.sidebar.checkbox("Contrast Enhancement", True)
-    grayscale = st.sidebar.checkbox("Grayscale Conversion")
-    blur = st.sidebar.checkbox("Blurring")
-    edge = st.sidebar.checkbox("Edge Detection (Canny)")
-    sharpen = st.sidebar.checkbox("Sharpening")
-    segment = st.sidebar.checkbox("Segmentation (Otsu’s Threshold)", True)
-    morph = st.sidebar.checkbox("Morphological Operations")
-    transform = st.sidebar.checkbox("Geometric Transformations")
-    color_ops = st.sidebar.checkbox("Color Transformations")
-    noise_ops = st.sidebar.checkbox("Noise Addition / Denoising")
+    enhance = st.sidebar.checkbox("Contrast Enhancement", False)
+    grayscale = st.sidebar.checkbox("Grayscale Conversion", False)
+    blur = st.sidebar.checkbox("Blurring", False)
+    edge = st.sidebar.checkbox("Edge Detection (Canny)", False)
+    sharpen = st.sidebar.checkbox("Sharpening", False)
+    segment = st.sidebar.checkbox("Segmentation (Otsu’s Threshold)", False)
+    morph = st.sidebar.checkbox("Morphological Operations", False)
+    transform = st.sidebar.checkbox("Geometric Transformations", False)
+    color_ops = st.sidebar.checkbox("Color Transformations", False)
+    noise_ops = st.sidebar.checkbox("Noise Addition / Denoising", False)
 
     processed = img_rgb.copy()
 
@@ -120,11 +118,9 @@ if uploaded_file is not None:
             s_vs_p = 0.5
             amount = 0.02
             out = np.copy(processed)
-            # Salt noise
             num_salt = np.ceil(amount * processed.size * s_vs_p)
             coords = [np.random.randint(0, i - 1, int(num_salt)) for i in processed.shape]
             out[coords[0], coords[1], :] = 255
-            # Pepper noise
             num_pepper = np.ceil(amount * processed.size * (1. - s_vs_p))
             coords = [np.random.randint(0, i - 1, int(num_pepper)) for i in processed.shape]
             out[coords[0], coords[1], :] = 0
